@@ -1,0 +1,54 @@
+plugins{
+    id 'java'
+    id 'com.github.spotbugs' version '6.0.25'
+    id 'jacoco'
+} 
+
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
+
+[compileJava, compileTestJava]*.options*.encoding = 'utf-8'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // 単体テスト用の設定．
+    // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.11.3'
+    // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-engine
+    testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.11.3'
+}
+
+jar{
+    manifest{
+        attributes 'Main-Class': 'gseminar.Runner'
+    }
+}
+
+spotbugs{
+    toolVersion = '4.8.6'
+    ignoreFailures = true
+}
+
+tasks.withType(com.github.spotbugs.snom.SpotBugsTask) {
+    reports {
+        xml.enabled = false
+        html.enabled = true
+    }
+}
+
+test { // jacoco でのカバレッジレポートを出力するために以下の2行が必要となる．
+    useJUnitPlatform()
+    finalizedBy jacocoTestReport
+}
+
+// 以降，jacoco の設定．
+jacocoTestReport {
+    reports {
+        xml.required = true
+        csv.required = true
+        html.required = true
+    }
+}
